@@ -61,6 +61,7 @@
             cursor: pointer;
             font-family: 'Press Start 2P', cursive;
             text-transform: uppercase;
+            font-size: 0.8em; /* Smaller font size */
         }
         .chat-send.sending {
             background-color: #aaa;
@@ -68,6 +69,7 @@
         .chat-delete { 
             background-color: #e74c3c;
             margin-left: 5px;
+            font-size: 0.8em; /* Smaller font size */
         }
         .chat-send:disabled,
         .chat-delete:disabled {
@@ -147,6 +149,20 @@
             opacity: 0.1; /* Make the GIF subtle */
             pointer-events: none;
         }
+        .repository-link {
+            position: absolute;
+            bottom: 15px;
+            left: 15px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #ffffff;
+            font-family: 'Press Start 2P', cursive;
+        }
+        .repository-link img {
+            width: 40px;
+            height: 40px;
+        }
     </style>
 </head>
 <body>
@@ -166,6 +182,9 @@
             <button id="delete-button" class="chat-delete">Delete</button>
         </div>
     </div>
+    <a href="https://github.com/harshith-eth/Llama-38-B-Instruct-Chat-Interface" class="repository-link" target="_blank">
+        <img src="github.png" alt="GitHub Logo">
+    </a>
 
     <script>
         const chatInput = document.getElementById('chat-input');
