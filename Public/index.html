@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Llama 38-b Instruct Chat Interface</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        body { 
+            font-family: 'Press Start 2P', cursive; 
+            background-color: #000000; /* Pitch black background */
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .chat-container { 
+            width: 75%;
+            height: 85%;
+            border: 2px solid #007bff;
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 0 20px #007bff;
+            position: relative;
+            z-index: 2;
+        }
+        .chat-box { 
+            flex-grow: 1;
+            padding: 10px;
+            overflow-y: scroll;
+            background-color: rgba(30, 30, 30, 0.8); /* More translucent background */
+            border-bottom: 2px solid #007bff;
+            line-height: 1.5;
+        }
+        .chat-input-container {
+            display: flex;
+            border-top: 2px solid #007bff;
+            background-color: #333;
+        }
+        .chat-input { 
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #333;
+            border: none;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+        }
+        .chat-input:focus {
+            outline: none;
+        }
+        .chat-send, .chat-delete { 
+            width: 80px;
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+        }
+        .chat-send.sending {
+            background-color: #aaa;
+        }
+        .chat-delete { 
+            background-color: #e74c3c;
+            margin-left: 5px;
+        }
+        .chat-send:disabled,
+        .chat-delete:disabled {
+            background-color: #aaa;
+        }
+        .chat-send:focus,
+        .chat-delete:focus {
+            outline: none;
+        }
+        .chat-header {
+            padding: 10px;
+            background-color: #333;
+            text-align: center;
+            border-bottom: 2px solid #007bff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .chat-header .name {
+            font-size: 1em;
+            margin: 5px 0;
+        }
+        .chat-header .description {
+            margin: 5px 0 0;
+            font-size: 0.8em;
+        }
+        .chat-header a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+        .chat-message {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .chat-message .content {
+            padding: 10px;
+            border: 2px solid #007bff;
+            max-width: 60%;
+            line-height: 1.5;
+            font-family: 'Press Start 2P', cursive;
+        }
+        .chat-message.you {
+            justify-content: flex-end;
+        }
+        .chat-message.you .content {
+            background-color: #444;
+            color: #fff;
+            border: 2px solid #4caf50;
+        }
+        .chat-message.bot .content {
+            background-color: #333;
+            color: #fff;
+        }
+        .background-elements {
+            position: absolute;
+            top: 10%; /* Adjusted to move the GIF lower */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .background-elements img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1; /* Make the GIF subtle */
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-elements">
+        <img src="llama.gif" alt="Llama GIF">
+    </div>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Llama 38-b Instruct Chat Interface</h1>
+            <p class="name"><a href="https://www.linkedin.com/in/harshith-vaddiparthy/" target="_blank">Harshith Vaddiparthy</a></p>
+            <p class="description">A non-code Growth Marketer who can now code, thanks to ChatGPT 🚀</p>
+        </div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-input-container">
+            <textarea id="chat-input" class="chat-input" rows="1" placeholder="Type a message"></textarea>
+            <button id="chat-send" class="chat-send" disabled>Send</button>
+            <button id="delete-button" class="chat-delete">Delete</button>
+        </div>
+    </div>
+
+    <script>
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatBox = document.getElementById('chat-box');
+        const deleteButton = document.getElementById('delete-button');
+
+        chatInput.addEventListener('input', () => {
+            chatSend.disabled = !chatInput.value.trim();
+        });
+
+        chatInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                if (event.metaKey) { // Command + Enter to send
+                    event.preventDefault();
+                    sendMessage();
+                } else {
+                    event.preventDefault();
+                    const start = chatInput.selectionStart;
+                    const end = chatInput.selectionEnd;
+
+                    chatInput.value = chatInput.value.substring(0, start) + "\n" + chatInput.value.substring(end);
+                    chatInput.selectionStart = chatInput.selectionEnd = start + 1;
+                }
+            }
+        });
+
+        chatSend.addEventListener('click', sendMessage);
+
+        deleteButton.addEventListener('click', () => {
+            chatBox.innerHTML = '';
+        });
+
+        async function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            chatInput.value = '';
+            chatSend.disabled = true;
+            chatSend.classList.add('sending');
+
+            appendMessage('You', message);
+
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+
+            const result = await response.json();
+            appendMessage('Bot', result.message);
+
+            chatSend.disabled = false;
+            chatSend.classList.remove('sending');
+        }
+
+        function appendMessage(sender, message) {
+            const div = document.createElement('div');
+            div.classList.add('chat-message');
+            div.classList.add(sender.toLowerCase());
+            const contentDiv = document.createElement('div');
+            contentDiv.classList.add('content');
+            contentDiv.innerHTML = `<strong class="${sender.toLowerCase()}">${sender}:</strong><p>${message}</p>`;
+            div.appendChild(contentDiv);
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
