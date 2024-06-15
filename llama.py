@@ -5,8 +5,6 @@ import ssl
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 
-app = Flask(__name__)
-
 # Load environment variables from .env file
 load_dotenv()
 
@@ -16,6 +14,8 @@ def allowSelfSignedHttps(allowed):
         ssl._create_default_https_context = ssl._create_unverified_context
 
 allowSelfSignedHttps(True) # This line is needed if you use self-signed certificate in your scoring service.
+
+app = Flask(__name__)
 
 @app.route('/generate', methods=['POST'])
 def generate():
