@@ -54,14 +54,14 @@
             outline: none;
         }
         .chat-send, .chat-delete { 
-            width: 80px;
+            width: 70px; /* Reduced width to fit within the container */
             background-color: #4caf50;
             color: #fff;
             border: none;
             cursor: pointer;
             font-family: 'Press Start 2P', cursive;
             text-transform: uppercase;
-            font-size: 0.8em; /* Smaller font size */
+            font-size: 0.7em; /* Smaller font size */
         }
         .chat-send.sending {
             background-color: #aaa;
@@ -69,7 +69,7 @@
         .chat-delete { 
             background-color: #e74c3c;
             margin-left: 5px;
-            font-size: 0.8em; /* Smaller font size */
+            font-size: 0.7em; /* Smaller font size */
         }
         .chat-send:disabled,
         .chat-delete:disabled {
@@ -153,15 +153,11 @@
             position: absolute;
             bottom: 15px;
             left: 15px;
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            color: #ffffff;
-            font-family: 'Press Start 2P', cursive;
+            z-index: 3; /* Bring link to the front */
         }
         .repository-link img {
-            width: 40px;
-            height: 40px;
+            width: 50px; /* Adjust size as needed */
+            height: 50px; /* Adjust size as needed */
         }
     </style>
 </head>
